@@ -5,8 +5,9 @@ import '../models/inventory.dart'; // Import the Inventory model
 
 class InventoryPage extends StatefulWidget {
   final Inventory inventory; // Accept the Inventory instance
+  final List<String> transactions; // Accept the transactions list
 
-  const InventoryPage({super.key, required this.inventory});
+  const InventoryPage({super.key, required this.inventory, required this.transactions});
 
   @override
   _InventoryPageState createState() => _InventoryPageState();
@@ -70,6 +71,8 @@ class _InventoryPageState extends State<InventoryPage> {
                 setState(() {
                   int? newLimit = int.tryParse(limitController.text);
                   if (newLimit != null) {
+                    // Log the change
+                    widget.transactions.add("Changed paper limit from ${widget.inventory.paperLimit} to $newLimit on ${DateTime.now().toLocal()}");
                     widget.inventory.paperLimit = newLimit; // Update the limit
                   }
                 });

@@ -2,25 +2,26 @@
 
 import 'package:flutter/material.dart';
 import 'inventory_page.dart'; // Import the InventoryPage
+import 'view_report_page.dart'; // Import the ViewReportPage
 import '../models/inventory.dart'; // Ensure to import the Inventory model
 
 class AdminPage extends StatelessWidget {
   final Inventory inventory; // Add the inventory parameter
+  final List<String> transactions; // Add transactions parameter
 
-  const AdminPage({super.key, required this.inventory}); // Include inventory in the constructor
+  const AdminPage({super.key, required this.inventory, required this.transactions}); // Include inventory and transactions in the constructor
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Admin Page"),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "Welcome to the Admin Page!",
+              "ADMIN PAGE",
               style: TextStyle(fontSize: 24.0),
             ),
             SizedBox(height: 20), // Space between text and buttons
@@ -31,11 +32,16 @@ class AdminPage extends StatelessWidget {
               height: 100, // Set height for the button
               child: ElevatedButton(
                 onPressed: () {
-                  // Add functionality for viewing reports
-                  // Navigator.push(...); // Example for navigation to another page
+                  // Navigate to the View Report Page
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ViewReportPage(transactions: transactions), // Pass transactions
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue, // Button color
+                  backgroundColor: const Color.fromARGB(255, 0, 35, 64), // Button color
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15.0), // Rounded corners
                   ),
@@ -59,7 +65,7 @@ class AdminPage extends StatelessWidget {
                   // Navigator.push(...); // Example for navigation to another page
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green, // Button color
+                  backgroundColor: const Color.fromARGB(255, 1, 69, 3), // Button color
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15.0), // Rounded corners
                   ),
@@ -82,11 +88,11 @@ class AdminPage extends StatelessWidget {
                   // Navigate to the InventoryPage
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => InventoryPage(inventory: inventory)), // Pass inventory
+                    MaterialPageRoute(builder: (context) => InventoryPage(inventory: inventory, transactions: transactions)), // Pass inventory and transactions
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange, // Button color
+                  backgroundColor: const Color.fromARGB(255, 56, 34, 0), // Button color
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15.0), // Rounded corners
                   ),

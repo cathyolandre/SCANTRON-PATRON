@@ -5,8 +5,9 @@ import '../models/inventory.dart'; // Import the Inventory model
 
 class OrderPage extends StatefulWidget {
   final Inventory inventory; // Accept the inventory
+  final List<String> transactions; // Accept the transactions list
 
-  const OrderPage({super.key, required this.inventory});
+  const OrderPage({super.key, required this.inventory, required this.transactions}); // Include transactions in the constructor
 
   @override
   _OrderPageState createState() => _OrderPageState();
@@ -14,7 +15,7 @@ class OrderPage extends StatefulWidget {
 
 class _OrderPageState extends State<OrderPage> {
   int _counter = 0; // Initialize the counter
-  List<String> transactions = []; // List to store print transactions
+  // List<String> transactions; // This is already passed from the widget
 
   void _incrementCounter() {
     setState(() {
@@ -31,14 +32,14 @@ class _OrderPageState extends State<OrderPage> {
   }
 
   void _printReceipt() {
-    // Store the current count in a temporary variable
-    final int printCount = _counter; 
+    final int printCount = _counter;
 
     // Deduct from inventory
     widget.inventory.deductPaper(printCount);
-    
-    // Record the transaction
-    transactions.add("Printed $printCount Scantrons");
+
+    // Record the transaction with date and time
+    String transaction = "Printed $printCount Scantrons at ${DateTime.now()}";
+    widget.transactions.add(transaction); // Add transaction to the list
 
     // Show receipt dialog
     showDialog(

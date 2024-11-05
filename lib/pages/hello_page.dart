@@ -11,6 +11,7 @@ class HelloPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Inventory inventory = Inventory(200); // Define your paper limit here
+    List<String> transactions = []; // Initialize transactions list
 
     return Scaffold(
       body: Center(
@@ -39,12 +40,12 @@ class HelloPage extends StatelessWidget {
             ),
             SizedBox(height: 20), // Space between the container and buttons
 
-            // Button to navigate to OrderPage with inventory
+            // Button to navigate to OrderPage with inventory and transactions
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => OrderPage(inventory: inventory)), // Pass inventory
+                  MaterialPageRoute(builder: (context) => OrderPage(inventory: inventory, transactions: transactions)), // Pass inventory and transactions
                 );
               },
               style: ElevatedButton.styleFrom(
@@ -64,7 +65,7 @@ class HelloPage extends StatelessWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AdminPage(inventory: inventory)), // Pass inventory
+            MaterialPageRoute(builder: (context) => AdminPage(inventory: inventory, transactions: transactions)), // Pass inventory and transactions
           );
         },
         backgroundColor: Colors.black,
