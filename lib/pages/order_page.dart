@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import '../models/inventory.dart'; // Import the Inventory model
+import '../pages/notice_page.dart'; // Import the NoticePage
 
 class OrderPage extends StatefulWidget {
   final Inventory inventory; // Accept the inventory
@@ -15,11 +16,10 @@ class OrderPage extends StatefulWidget {
 
 class _OrderPageState extends State<OrderPage> {
   int _counter = 0; // Initialize the counter
-  // List<String> transactions; // This is already passed from the widget
 
   void _incrementCounter() {
     setState(() {
-      if (_counter < widget.inventory.paperLimit) { // Ensure counter does not exceed paper limit
+      if (_counter < widget.inventory.paperLimit && widget.inventory.paperLimit > 5) { // Ensure counter does not exceed paper limit and is above 5
         _counter++;
       }
     });
@@ -52,7 +52,18 @@ class _OrderPageState extends State<OrderPage> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
-                Navigator.pop(context); // Go back to HelloPage
+
+                // Check the current paper count after printing
+                if (widget.inventory.paperLimit <= 30) { // Check the paper limit
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NoticePage(currentPaperCount: widget.inventory.paperLimit, transactions: [],), // Pass current paper count
+                    ),
+                  );
+                } else {
+                  Navigator.pop(context); // Go back to HelloPage
+                }
               },
               child: Text("OK"),
             ),
@@ -110,9 +121,9 @@ class _OrderPageState extends State<OrderPage> {
                 ),
                 SizedBox(width: 20), // Space between counter and button
                 ElevatedButton(
-                  onPressed: _incrementCounter,
+                  onPressed: widget.inventory.paperLimit > 5 ? _incrementCounter : null, // Disable if paper limit is 5 or below
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
+                    backgroundColor: widget.inventory.paperLimit > 5 ? const Color.fromARGB(255, 0, 0, 0) : Colors.grey,
                     padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 25.0),
                   ),
                   child: Text(
@@ -126,7 +137,7 @@ class _OrderPageState extends State<OrderPage> {
             ElevatedButton(
               onPressed: _counter >= 1 ? _printReceipt : null, // Disable if counter is less than 1
               style: ElevatedButton.styleFrom(
-                backgroundColor: _counter >= 1 ? const Color.fromARGB(255, 0, 0, 0) : Colors.grey, // Change color if disabled
+                backgroundColor: _counter >= 1 ? const Color.fromARGB(255, 0, 0, 0) : Colors.grey,
                 padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 15.0),
               ),
               child: Text(

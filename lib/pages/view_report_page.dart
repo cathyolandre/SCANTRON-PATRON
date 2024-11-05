@@ -3,9 +3,9 @@
 import 'package:flutter/material.dart';
 
 class ViewReportPage extends StatelessWidget {
-  final List<String> transactions; // Accept the transactions list
+  final List<String> transactions;
 
-  const ViewReportPage({super.key, required this.transactions}); // Constructor that takes transactions
+  const ViewReportPage({super.key, required this.transactions});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class ViewReportPage extends StatelessWidget {
         itemCount: transactions.length,
         itemBuilder: (context, index) {
           return ListTile(
-            title: Text(transactions[index]), // Display each transaction
+            title: Text(transactions[index]),
           );
         },
       ),

@@ -11,7 +11,7 @@ class HelloPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Inventory inventory = Inventory(200); // Define your paper limit here
-    List<String> transactions = []; // Initialize transactions list
+    final List<String> transactions = []; // Initialize the transactions list
 
     return Scaffold(
       body: Center(
@@ -57,20 +57,61 @@ class HelloPage extends StatelessWidget {
                 style: TextStyle(color: Colors.white),
               ),
             ),
-            SizedBox(height: 10), // Space between the two buttons
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AdminPage(inventory: inventory, transactions: transactions)), // Pass inventory and transactions
-          );
+          _showLoginDialog(context, inventory, transactions); // Show login dialog instead of directly navigating
         },
         backgroundColor: Colors.black,
-        child: Icon(Icons.navigate_next),
+        child: const Icon(Icons.navigate_next),
       ),
+    );
+  }
+
+  void _showLoginDialog(BuildContext context, Inventory inventory, List<String> transactions) {
+    final TextEditingController passwordController = TextEditingController();
+    const String correctPassword = "1234"; // Set your desired password here
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Admin Login"),
+          content: TextField(
+            controller: passwordController,
+            decoration: InputDecoration(hintText: "Enter password"),
+            obscureText: true,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                if (passwordController.text == correctPassword) {
+                  Navigator.of(context).pop(); // Close the dialog
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AdminPage(inventory: inventory, transactions: transactions), // Navigate to AdminPage
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Incorrect password")),
+                  );
+                }
+              },
+              child: Text("Login"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text("Cancel"),
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -18,7 +18,7 @@ class _InventoryPageState extends State<InventoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Inventory Management"),
+        title: const Text("Inventory Management"),
       ),
       body: Center(
         child: Column(
@@ -26,9 +26,9 @@ class _InventoryPageState extends State<InventoryPage> {
           children: [
             Text(
               "Current Paper Limit: ${widget.inventory.paperLimit}",
-              style: TextStyle(fontSize: 24),
+              style: const TextStyle(fontSize: 24),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 _showChangeLimitDialog(context);
@@ -36,7 +36,7 @@ class _InventoryPageState extends State<InventoryPage> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
               ),
-              child: Text("Change Paper Limit"),
+              child: const Text("Change Paper Limit"),
             ),
           ],
         ),
@@ -51,11 +51,11 @@ class _InventoryPageState extends State<InventoryPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Change Paper Limit"),
+          title: const Text("Change Paper Limit"),
           content: TextField(
             controller: limitController,
             keyboardType: TextInputType.number,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: "Enter new limit",
             ),
           ),
@@ -64,21 +64,27 @@ class _InventoryPageState extends State<InventoryPage> {
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: Text("Cancel"),
+              child: const Text("Cancel"),
             ),
             TextButton(
               onPressed: () {
                 setState(() {
                   int? newLimit = int.tryParse(limitController.text);
                   if (newLimit != null) {
-                    // Log the change
+                    // Log the change in transactions
                     widget.transactions.add("Changed paper limit from ${widget.inventory.paperLimit} to $newLimit on ${DateTime.now().toLocal()}");
                     widget.inventory.paperLimit = newLimit; // Update the limit
+
+                    // If the limit is 30 or below, return to HelloPage with updated inventory
+                    if (newLimit <= 30) {
+                      Navigator.pop(context, widget.inventory); // Return updated inventory to HelloPage
+                    } else {
+                      Navigator.of(context).pop(); // Close the dialog without returning
+                    }
                   }
                 });
-                Navigator.of(context).pop(); // Close the dialog
               },
-              child: Text("OK"),
+              child: const Text("OK"),
             ),
           ],
         );
