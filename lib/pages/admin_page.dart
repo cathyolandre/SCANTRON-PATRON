@@ -6,25 +6,69 @@ import 'view_report_page.dart'; // Import the ViewReportPage
 import '../models/inventory.dart'; // Ensure to import the Inventory model
 import 'notice_page.dart'; // Import the NoticePage
 import 'hello_page.dart'; // Import the HelloPage
+import 'package:shared_preferences/shared_preferences.dart';
 
-class AdminPage extends StatelessWidget {
+class AdminPage extends StatefulWidget {
   final Inventory inventory; // Add the inventory parameter
   final List<String> transactions; // Add transactions parameter
 
   const AdminPage({super.key, required this.inventory, required this.transactions}); // Include inventory and transactions in the constructor
 
   @override
+  _AdminPageState createState() => _AdminPageState();
+}
+
+class _AdminPageState extends State<AdminPage> {
+  late int paperLimit;
+
+  @override
+  void initState() {
+    super.initState();
+    paperLimit = widget.inventory.paperLimit;
+    _loadPaperLimit();
+    _loadTransactions();
+  }
+
+  // Load paper limit from SharedPreferences
+  Future<void> _loadPaperLimit() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      paperLimit = prefs.getInt('paperLimit') ?? widget.inventory.paperLimit;
+    });
+  }
+
+  // Load transaction log from SharedPreferences
+  Future<void> _loadTransactions() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      widget.transactions.addAll(prefs.getStringList('transactions') ?? []);
+    });
+  }
+
+  // Save updated transaction log to SharedPreferences
+  Future<void> _saveTransactions() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('transactions', widget.transactions);
+  }
+
+  // Save updated paper limit to SharedPreferences
+  Future<void> _savePaperLimit(int limit) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('paperLimit', limit);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
         // Check the paper limit here
-        if (inventory.paperLimit <= 30) {
+        if (paperLimit <= 30) {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (context) => NoticePage(
-                currentPaperCount: inventory.paperLimit,
-                transactions: transactions,
+                currentPaperCount: paperLimit,
+                transactions: widget.transactions,
               ),
             ),
           );
@@ -59,7 +103,7 @@ class AdminPage extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ViewReportPage(transactions: transactions), // Pass transactions
+                        builder: (context) => ViewReportPage(transactions: widget.transactions), // Pass transactions
                       ),
                     );
                   },
@@ -85,7 +129,6 @@ class AdminPage extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () {
                     // Add functionality for managing users
-                    // Navigator.push(...); // Example for navigation to another page
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 1, 69, 3), // Button color
@@ -107,14 +150,26 @@ class AdminPage extends StatelessWidget {
                 width: 100, // Set width for the button
                 height: 100, // Set height for the button
                 child: ElevatedButton(
-                  onPressed: () {
-                    // Navigate to the InventoryPage
-                    Navigator.push(
+                  onPressed: () async {
+                    // Navigate to the InventoryPage and await changes
+                    var result = await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => InventoryPage(inventory: inventory, transactions: transactions), // Pass inventory and transactions
+                        builder: (context) => InventoryPage(
+                          inventory: widget.inventory,
+                          transactions: widget.transactions,
+                        ),
                       ),
                     );
+
+                    // If inventory was updated, refresh paper limit and save
+                    if (result != null && result is Inventory) {
+                      setState(() {
+                        paperLimit = result.paperLimit;
+                      });
+                      _savePaperLimit(paperLimit);
+                      _saveTransactions(); // Save transactions after any changes
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 56, 34, 0), // Button color

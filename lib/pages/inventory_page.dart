@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import '../models/inventory.dart'; // Import the Inventory model
+import 'package:shared_preferences/shared_preferences.dart';
 
 class InventoryPage extends StatefulWidget {
   final Inventory inventory; // Accept the Inventory instance
@@ -14,6 +15,29 @@ class InventoryPage extends StatefulWidget {
 }
 
 class _InventoryPageState extends State<InventoryPage> {
+  late int paperLimit;
+
+  @override
+  void initState() {
+    super.initState();
+    paperLimit = widget.inventory.paperLimit;
+    _loadPaperLimit();
+  }
+
+  // Load paper limit from SharedPreferences
+  Future<void> _loadPaperLimit() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      paperLimit = prefs.getInt('paperLimit') ?? widget.inventory.paperLimit;
+    });
+  }
+
+  // Save paper limit to SharedPreferences
+  Future<void> _savePaperLimit(int limit) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('paperLimit', limit);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,7 +49,7 @@ class _InventoryPageState extends State<InventoryPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "Current Paper Limit: ${widget.inventory.paperLimit}",
+              "Current Paper Limit: $paperLimit",
               style: const TextStyle(fontSize: 24),
             ),
             const SizedBox(height: 20),
@@ -72,8 +96,11 @@ class _InventoryPageState extends State<InventoryPage> {
                   int? newLimit = int.tryParse(limitController.text);
                   if (newLimit != null) {
                     // Log the change in transactions
-                    widget.transactions.add("Changed paper limit from ${widget.inventory.paperLimit} to $newLimit on ${DateTime.now().toLocal()}");
-                    widget.inventory.paperLimit = newLimit; // Update the limit
+                    widget.transactions.add("Changed paper limit from $paperLimit to $newLimit on ${DateTime.now().toLocal()}");
+
+                    paperLimit = newLimit; // Update the displayed limit
+                    widget.inventory.paperLimit = newLimit; // Update the Inventory instance
+                    _savePaperLimit(newLimit); // Persist the new limit
 
                     // If the limit is 30 or below, return to HelloPage with updated inventory
                     if (newLimit <= 30) {
